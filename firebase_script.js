@@ -1,6 +1,8 @@
 // firebase_script.js
 
-// Import Firebase App (must be before other Firebase SDKs)
+// Upewnij się, że korzystasz z wersji compat (zgodnej z firebase-app-compat.js)
+
+// Konfiguracja Twojego projektu Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAGIqIV-7oeMGa4EHGSQn-wGzo20jcL1aU",
   authDomain: "czolgi-online.firebaseapp.com",
@@ -11,8 +13,8 @@ const firebaseConfig = {
   measurementId: "G-2K5GFY7K9P"
 };
 
-// Initialize Firebase
+// Inicjalizacja Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Firestore instance
+// Inicjalizacja Firestore
 const db = firebase.firestore();
