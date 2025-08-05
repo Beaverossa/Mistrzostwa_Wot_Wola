@@ -9,26 +9,25 @@
 <body class="p-4">
   <div class="container">
     <h1 class="mb-4">Wybierz czołgi do pojedynku</h1>
-    <form id="matchForm" style="display:none;">
+    <form id="matchForm">
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Gracz 1:</label>
           <select class="form-select" id="player1Select" required></select>
-          <input type="number" id="player1Pos" class="form-control mt-2" placeholder="Numer pozycji Gracza 1" min="1" required />
-          <button type="button" id="showTank1Btn" class="btn btn-outline-secondary mt-2">Pokaż czołg Gracza 1</button>
-          <div id="tank1Name" class="mt-2 fw-bold"></div>
+          <label class="form-label mt-2">Numer czołgu (1 do X):</label>
+          <input type="number" class="form-control" id="player1Pos" min="1" required />
         </div>
         <div class="col-md-6 mb-3">
           <label class="form-label">Gracz 2:</label>
           <select class="form-select" id="player2Select" required></select>
-          <input type="number" id="player2Pos" class="form-control mt-2" placeholder="Numer pozycji Gracza 2" min="1" required />
-          <button type="button" id="showTank2Btn" class="btn btn-outline-secondary mt-2">Pokaż czołg Gracza 2</button>
-          <div id="tank2Name" class="mt-2 fw-bold"></div>
+          <label class="form-label mt-2">Numer czołgu (1 do X):</label>
+          <input type="number" class="form-control" id="player2Pos" min="1" required />
         </div>
       </div>
       <div class="mb-3">
         <label class="form-label">Zwycięzca:</label>
         <select class="form-select" id="winnerSelect" required>
+          <option value="">-- wybierz --</option>
           <option value="1">Gracz 1</option>
           <option value="2">Gracz 2</option>
         </select>
@@ -38,12 +37,10 @@
     <hr />
     <a href="index.html" class="btn btn-link">Dodaj czołgi</a>
     <a href="history.html" class="btn btn-link">Zobacz historię</a>
-    <button id="logoutBtn" class="btn btn-danger float-end">Wyloguj się</button>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="firebase_script.js"></script>
   <script src="match.js"></script>
 </body>
