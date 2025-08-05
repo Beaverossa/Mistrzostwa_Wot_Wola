@@ -1,107 +1,67 @@
-window.addEventListener('DOMContentLoaded', () => {
-  const auth = window.auth;
-  const db = window.db;
-
-  const matchForm = document.getElementById('matchForm');
+window.addEventListener('DOMContentLoaded', async () => {
   const player1Select = document.getElementById('player1Select');
   const player2Select = document.getElementById('player2Select');
-  const player1Pos = document.getElementById('player1Pos');
-  const player2Pos = document.getElementById('player2Pos');
+  const player1PosInput = document.getElementById('player1Pos');
+  const player2PosInput = document.getElementById('player2Pos');
   const winnerSelect = document.getElementById('winnerSelect');
-  const showTank1Btn = document.getElementById('showTank1Btn');
-  const showTank2Btn = document.getElementById('showTank2Btn');
-  const tank1NameDiv = document.getElementById('tank1Name');
-  const tank2NameDiv = document.getElementById('tank2Name');
-  const logoutBtn = document.getElementById('logoutBtn');
+  const matchForm = document.getElementById('matchForm');
 
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = 'login.html';
-    } else {
-      matchForm.style.display = 'block';
-      loadPlayers();
-    }
-  });
-
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut().then(() => {
-      window.location.href = 'login.html';
-    });
-  });
-
+  // Load all player names to selects
   async function loadPlayers() {
-    try {
-      const snapshot = await db.collection('tankLists').get();
-      player1Select.innerHTML = '<option value="">-- wybierz gracza --</option>';
-      player2Select.innerHTML = '<option value="">-- wybierz gracza --</option>';
-      snapshot.forEach(doc => {
-        const name = doc.id;
-        player1Select.innerHTML += `<option value="${name}">${name}</option>`;
-        player2Select.innerHTML += `<option value="${name}">${name}</option>`;
-      });
-    } catch (err) {
-      alert('Błąd ładowania graczy: ' + err.message);
-    }
+    const snapshot = await db.collection('tankLists').get();
+    player1Select.innerHTML = '<option value="">-- wybierz --</option>';
+    player2Select.innerHTML = '<option value="">-- wybierz --</option>';
+    snapshot.forEach(doc => {
+      const name = doc.id;
+      const option1 = document.createElement('option');
+      option1.value = name;
+      option1.textContent = name;
+      player1Select.appendChild(option1);
+
+      const option2 = document.createElement('option');
+      option2.value = name;
+      option2.textContent = name;
+      player2Select.appendChild(option2);
+    });
   }
 
-  async function getTankName(player, pos) {
-    if (!player || !pos) return null;
-    try {
-      const doc = await db.collection('tankLists').doc(player).get();
-      if (!doc.exists) return null;
-      const tanks = doc.data().tanks;
-      const idx = Number(pos) - 1;
-      if (idx < 0 || idx >= tanks.length) return null;
-      return tanks[idx];
-    } catch {
-      return null;
-    }
-  }
+  await loadPlayers();
 
-  showTank1Btn.addEventListener('click', async () => {
-    const name = await getTankName(player1Select.value, player1Pos.value);
-    tank1NameDiv.textContent = name ? name : 'Nie znaleziono czołgu na tej pozycji';
-  });
-
-  showTank2Btn.addEventListener('click', async () => {
-    const name = await getTankName(player2Select.value, player2Pos.value);
-    tank2NameDiv.textContent = name ? name : 'Nie znaleziono czołgu na tej pozycji';
-  });
-
-  matchForm.addEventListener('submit', async (e) => {
+  matchForm.addEventListener('submit', async e => {
     e.preventDefault();
-    if (!player1Select.value || !player2Select.value) {
-      alert('Wybierz oboje graczy.');
-      return;
-    }
-    if (!player1Pos.value || !player2Pos.value) {
-      alert('Wprowadź numery pozycji obu graczy.');
-      return;
-    }
-    if (player1Select.value === player2Select.value && player1Pos.value === player2Pos.value) {
-      alert('Obaj gracze nie mogą wybrać tego samego czołgu.');
-      return;
-    }
 
+    const player1 = player1Select.value;
+    const player2 = player2Select.value;
+    const player1Pos = parseInt(player1PosInput.value);
+    const player2Pos = parseInt(player2PosInput.value);
     const winner = winnerSelect.value;
-    const user = auth.currentUser;
+
+    if (!player1 || !player2 || !winner) {
+      alert('Wypełnij wszystkie pola!');
+      return;
+    }
+    if (player1 === player2) {
+      alert('Wybierz różnych graczy!');
+      return;
+    }
+    if (player1Pos < 1 || player2Pos < 1) {
+      alert('Numer pozycji musi być >= 1!');
+      return;
+    }
 
     try {
       await db.collection('matches').add({
-        player1: player1Select.value,
-        player2: player2Select.value,
-        player1Pos: Number(player1Pos.value),
-        player2Pos: Number(player2Pos.value),
+        player1,
+        player2,
+        player1Pos,
+        player2Pos,
         winner,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        userId: user.uid
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       alert('Wynik zapisany!');
       matchForm.reset();
-      tank1NameDiv.textContent = '';
-      tank2NameDiv.textContent = '';
     } catch (err) {
-      alert('Błąd zapisu wyniku: ' + err.message);
+      alert('Błąd zapisu: ' + err.message);
     }
   });
 });
