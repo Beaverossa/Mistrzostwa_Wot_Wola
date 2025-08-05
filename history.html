@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Historia Pojedynków i Ranking</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="firebase_script.js"></script>
 </head>
 <body class="p-4">
   <div class="container">
@@ -24,54 +21,16 @@
     </div>
 
     <hr />
-    <a href="index.html" class="btn btn-link">Wróć do formularza</a>
+    <a href="index.html" class="btn btn-link">Formularz</a>
     <a href="archive.html" class="btn btn-link">Archiwum</a>
     <a href="match.html" class="btn btn-link">Pojedynki</a>
   </div>
 
-  <script>
-    const rankingList = document.getElementById('rankingList');
-    const matchHistory = document.getElementById('matchHistory');
-
-    async function loadMatches() {
-      const results = await getMatchResults();
-      rankingList.innerHTML = '';
-      matchHistory.innerHTML = '';
-
-      const winCount = {};
-
-      results.forEach((match, index) => {
-        // Liczenie zwycięstw
-        if (!winCount[match.winner]) winCount[match.winner] = 0;
-        winCount[match.winner]++;
-
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-        li.innerHTML = `
-          <span>${match.player1} (${match.tank1}) vs ${match.player2} (${match.tank2}) → <strong>${match.winner}</strong></span>
-          <button class="btn btn-sm btn-outline-danger">Usuń</button>
-        `;
-
-        const btn = li.querySelector('button');
-        btn.addEventListener('click', async () => {
-          if (!confirm('Czy na pewno chcesz usunąć ten pojedynek?')) return;
-          await deleteMatchResult(match.id);
-          loadMatches();
-        });
-
-        matchHistory.appendChild(li);
-      });
-
-      const sortedRanking = Object.entries(winCount).sort((a, b) => b[1] - a[1]);
-      sortedRanking.forEach(([player, wins], index) => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = `#${index + 1} ${player} – ${wins} zwycięstw`;
-        rankingList.appendChild(li);
-      });
-    }
-
-    loadMatches();
-  </script>
+  <!-- Firebase & Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="firebase_script.js"></script>
+  <script src="history.js"></script>
 </body>
 </html>
