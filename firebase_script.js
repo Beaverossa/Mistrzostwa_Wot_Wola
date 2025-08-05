@@ -7,11 +7,9 @@ window.addEventListener('DOMContentLoaded', () => {
     projectId: "czolgi-online",
     storageBucket: "czolgi-online.appspot.com",
     messagingSenderId: "586260490520",
-    appId: "1:586260490520:web:afa5fe105c17cb5479566d",
-    measurementId: "G-2K5GFY7K9P"
+    appId: "1:586260490520:web:afa5fe105c17cb5479566d"
   };
 
   firebase.initializeApp(firebaseConfig);
-  firebase.analytics();
   db = firebase.firestore();
 });
