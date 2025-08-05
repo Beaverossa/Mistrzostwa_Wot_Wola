@@ -9,7 +9,7 @@
 <body class="p-4">
   <div class="container">
     <h1 class="mb-4">Formularz gracza</h1>
-    <form id="tankForm" style="display:none;">
+    <form id="tankForm">
       <div class="mb-3">
         <label for="nameSelect" class="form-label">Wybierz imię:</label>
         <select class="form-select" id="nameSelect" required>
@@ -30,12 +30,12 @@
     <a href="match.html" class="btn btn-link">Pojedynki</a>
     <a href="archive.html" class="btn btn-link">Archiwum</a>
     <a href="history.html" class="btn btn-link">Historia</a>
-    <button id="logoutBtn" class="btn btn-danger float-end">Wyloguj się</button>
   </div>
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
   <script src="firebase_script.js"></script>
   <script src="index.js"></script>
 </body>
