@@ -1,19 +1,17 @@
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAGIqIV-7oeMGa4EHGSQn-wGzo20jcL1aU",
-  authDomain: "czolgi-online.firebaseapp.com",
-  projectId: "czolgi-online",
-  storageBucket: "czolgi-online.appspot.com",
-  messagingSenderId: "586260490520",
-  appId: "1:586260490520:web:afa5fe105c17cb5479566d",
-  measurementId: "G-2K5GFY7K9P"
-};
+let db;
 
-firebase.initializeApp(firebaseConfig);
-firebase.analytics();
+window.addEventListener('DOMContentLoaded', () => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyAGIqIV-7oeMGa4EHGSQn-wGzo20jcL1aU",
+    authDomain: "czolgi-online.firebaseapp.com",
+    projectId: "czolgi-online",
+    storageBucket: "czolgi-online.appspot.com",
+    messagingSenderId: "586260490520",
+    appId: "1:586260490520:web:afa5fe105c17cb5479566d",
+    measurementId: "G-2K5GFY7K9P"
+  };
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-window.auth = auth;
-window.db = db;
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+  db = firebase.firestore();
+});
