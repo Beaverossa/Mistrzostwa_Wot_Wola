@@ -1,5 +1,8 @@
 window.addEventListener('DOMContentLoaded', async () => {
-  // Czekamy aż baza danych (db) będzie gotowa
+  const userSelect = document.getElementById('userSelect');
+  const tankList = document.getElementById('tankList');
+  const deleteBtn = document.getElementById('deleteBtn');
+
   function waitForDb() {
     return new Promise(resolve => {
       const interval = setInterval(() => {
@@ -13,11 +16,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await waitForDb();
 
-  const userSelect = document.getElementById('userSelect');
-  const tankList = document.getElementById('tankList');
-  const deleteBtn = document.getElementById('deleteBtn');
-
-  // Pobierz użytkowników (dokumenty z kolekcji tankLists)
   async function loadUsers() {
     try {
       const snapshot = await db.collection('tankLists').get();
@@ -33,7 +31,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Pokaż pozycje czołgów danego użytkownika
   async function showPositions(userId) {
     tankList.innerHTML = '';
     deleteBtn.style.display = userId ? 'inline-block' : 'none';
@@ -58,11 +55,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         li.className = 'list-group-item list-group-item-action';
         li.textContent = `Pozycja ${index + 1}`;
         li.style.cursor = 'pointer';
-
         li.addEventListener('click', () => {
           alert(`Czołg na pozycji ${index + 1}: ${tank}`);
         });
-
         tankList.appendChild(li);
       });
     } catch (error) {
@@ -70,13 +65,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Nasłuchiwanie zmiany wyboru gracza
   userSelect.addEventListener('change', () => {
     const userId = userSelect.value;
     showPositions(userId);
   });
 
-  // Obsługa przycisku "Usuń listę"
   deleteBtn.addEventListener('click', async () => {
     const userId = userSelect.value;
     if (!userId) return;
@@ -96,6 +89,5 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Start: załaduj użytkowników do selecta
   await loadUsers();
 });
