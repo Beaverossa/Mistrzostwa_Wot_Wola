@@ -9,19 +9,16 @@
 <body class="p-4">
   <div class="container">
     <h1 class="mb-4">Archiwum Czołgów</h1>
-
-    <select id="userSelect" class="form-select mb-3">
-      <option value="">-- Wybierz użytkownika --</option>
-    </select>
-
-    <ul id="tankList" class="list-group mb-4"></ul>
-
+    <select id="userSelect" class="form-select mb-3" aria-label="Wybierz gracza"></select>
+    <ul id="tankList" class="list-group"></ul>
+    <button id="deleteListBtn" class="btn btn-danger mt-3" disabled>Usuń listę</button>
     <a href="index.html" class="btn btn-link mt-3">Powrót</a>
+    <button id="logoutBtn" class="btn btn-danger float-end">Wyloguj się</button>
   </div>
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="firebase_script.js"></script>
   <script src="archive.js"></script>
 </body>
