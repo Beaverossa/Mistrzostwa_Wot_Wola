@@ -63,7 +63,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   showTanksBtn.addEventListener('click', async () => {
-    // Debug log
     console.log('Pokaż nazwy czołgów - kliknięte');
 
     const p1 = player1Select.value;
@@ -98,6 +97,57 @@ window.addEventListener('DOMContentLoaded', async () => {
     tankName2Span.textContent = tank2;
 
     tanksDisplay.style.display = 'block';
+  });
+
+  // **DODANE: obsługa zapisu pojedynku z timestamp**
+  matchForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const p1 = player1Select.value;
+    const p2 = player2Select.value;
+    const pos1 = parseInt(position1Input.value);
+    const pos2 = parseInt(position2Input.value);
+    const winner = winnerSelect.value === "1" ? p1 : p2;
+
+    if (!p1 || !p2 || !pos1 || !pos2 || !winner) {
+      alert("Uzupełnij wszystkie pola i wybierz zwycięzcę.");
+      return;
+    }
+
+    try {
+      // Upewnij się, że czołgi są załadowane
+      if (player1Select.dataset.loaded !== p1) {
+        tanksP1 = await loadTanksForPlayer(p1);
+        player1Select.dataset.loaded = p1;
+      }
+      if (player2Select.dataset.loaded !== p2) {
+        tanksP2 = await loadTanksForPlayer(p2);
+        player2Select.dataset.loaded = p2;
+      }
+
+      const tank1 = tanksP1[pos1 - 1] || "?";
+      const tank2 = tanksP2[pos2 - 1] || "?";
+
+      await db.collection('matches').add({
+        player1: p1,
+        tank1: tank1,
+        player2: p2,
+        tank2: tank2,
+        position1: pos1,
+        position2: pos2,
+        winner: winner,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      alert("Pojedynek zapisany!");
+      matchForm.reset();
+      tanksDisplay.style.display = 'none';
+      tankName1Span.textContent = '?';
+      tankName2Span.textContent = '?';
+    } catch (error) {
+      alert("Błąd podczas zapisu pojedynku: " + error.message);
+      console.error(error);
+    }
   });
 
   await loadPlayers();
