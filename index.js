@@ -1,28 +1,9 @@
 window.addEventListener('DOMContentLoaded', () => {
-  const auth = window.auth;
-  const db = window.db;
-
   const form = document.getElementById('tankForm');
   const nameSelect = document.getElementById('nameSelect');
   const tankCountInput = document.getElementById('tankCount');
   const tankInputs = document.getElementById('tankInputs');
   const tankCountContainer = document.getElementById('tankCountContainer');
-  const logoutBtn = document.getElementById('logoutBtn');
-
-  // Sprawdzanie czy użytkownik jest zalogowany
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = 'login.html';
-    } else {
-      form.style.display = 'block';
-    }
-  });
-
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut().then(() => {
-      window.location.href = 'login.html';
-    });
-  });
 
   nameSelect.addEventListener('change', () => {
     tankCountContainer.style.display = nameSelect.value ? 'block' : 'none';
@@ -47,9 +28,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     if (!db) {
-      alert("Baza danych się jeszcze ładuje, spróbuj później.");
+      alert("Baza danych jeszcze się ładuje. Spróbuj za chwilę.");
       return;
     }
 
@@ -58,15 +38,14 @@ window.addEventListener('DOMContentLoaded', () => {
     const tanks = [...inputs].map(input => input.value.trim()).filter(v => v !== '');
 
     if (tanks.length === 0) {
-      alert('Wprowadź nazwy przynajmniej jednego czołgu.');
+      alert('Wprowadź co najmniej jeden czołg.');
       return;
     }
 
     try {
       await db.collection('tankLists').doc(name).set({
         tanks: tanks,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        userId: auth.currentUser.uid
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       alert('Zapisano listę!');
       form.reset();
