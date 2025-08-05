@@ -26,7 +26,6 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       await auth.signInWithEmailAndPassword(email, password);
       showMessage('Zalogowano pomyślnie!');
-      // Redirect to main page
       setTimeout(() => {
         window.location.href = 'index.html';
       }, 1000);
