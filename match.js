@@ -1,4 +1,5 @@
 window.addEventListener('DOMContentLoaded', async () => {
+  // Czekamy, aż obiekt 'db' (Firestore) będzie dostępny
   function waitForDb() {
     return new Promise(resolve => {
       const interval = setInterval(() => {
@@ -26,6 +27,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   let tanksP1 = [];
   let tanksP2 = [];
 
+  // Ładuje listę graczy do selectów
   async function loadPlayers() {
     try {
       const snapshot = await db.collection('tankLists').get();
@@ -50,7 +52,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  async function loadTanksForPlayer(playerId, playerNum) {
+  // Ładuje czołgi danego gracza z Firestore
+  async function loadTanksForPlayer(playerId) {
     if (!playerId) return [];
     try {
       const doc = await db.collection('tankLists').doc(playerId).get();
@@ -62,12 +65,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Po kliknięciu przycisku pokaż nazwy czołgów
   showTanksBtn.addEventListener('click', async () => {
     const p1 = player1Select.value;
     const p2 = player2Select.value;
     const pos1 = parseInt(position1Input.value);
     const pos2 = parseInt(position2Input.value);
 
+    // Walidacja wyborów
     if (!p1 || !p2) {
       alert("Wybierz obu graczy.");
       return;
@@ -77,7 +82,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Ładuj listy czołgów jeśli jeszcze nie załadowane lub gracze się zmienili
+    // Załaduj czołgi jeśli jeszcze nie załadowane lub zmienił się gracz
     if (player1Select.dataset.loaded !== p1) {
       tanksP1 = await loadTanksForPlayer(p1);
       player1Select.dataset.loaded = p1;
@@ -87,15 +92,18 @@ window.addEventListener('DOMContentLoaded', async () => {
       player2Select.dataset.loaded = p2;
     }
 
+    // Pobierz nazwy czołgów pod wskazanymi indeksami (uwaga: indeks 0-based)
     const tank1 = tanksP1[pos1 - 1] || "Brak czołgu na tej pozycji";
     const tank2 = tanksP2[pos2 - 1] || "Brak czołgu na tej pozycji";
 
+    // Wyświetl nazwy
     tankName1Span.textContent = tank1;
     tankName2Span.textContent = tank2;
 
     tanksDisplay.style.display = 'block';
   });
 
+  // Obsługa wysłania formularza pojedynku
   matchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -105,6 +113,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const pos2 = parseInt(position2Input.value);
     const winnerValue = winnerSelect.value;
 
+    // Walidacja
     if (!p1 || !p2) {
       alert("Wybierz obu graczy.");
       return;
@@ -118,8 +127,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const tank1 = tanksP1[pos1 - 1] || null;
-    const tank2 = tanksP2[pos2 - 1] || null;
+    const tank1 = tanksP1[pos1 - 1];
+    const tank2 = tanksP2[pos2 - 1];
 
     if (!tank1 || !tank2) {
       alert("Brak czołgu na podanej pozycji u jednego z graczy. Najpierw użyj przycisku 'Pokaż nazwy czołgów', aby zweryfikować numery.");
@@ -130,12 +139,24 @@ window.addEventListener('DOMContentLoaded', async () => {
       await db.collection('matches').add({
         player1: p1,
         tank1: tank1,
+        position1: pos1,
         player2: p2,
         tank2: tank2,
-        position1: pos1,
         position2: pos2,
         winner: winnerValue === "1" ? p1 : p2,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      alert("
+      alert("Pojedynek zapisany!");
+      matchForm.reset();
+      tanksDisplay.style.display = 'none';
+      tankName1Span.textContent = '?';
+      tankName2Span.textContent = '?';
+    } catch (error) {
+      alert("Błąd podczas zapisu pojedynku: " + error.message);
+      console.error(error);
+    }
+  });
+
+  await loadPlayers();
+});
