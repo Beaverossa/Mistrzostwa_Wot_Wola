@@ -1,5 +1,5 @@
 window.addEventListener('DOMContentLoaded', async () => {
-  // Czekamy aż zmienna db (Firestore) będzie gotowa
+  // Czekamy aż baza danych (db) będzie gotowa
   function waitForDb() {
     return new Promise(resolve => {
       const interval = setInterval(() => {
@@ -15,15 +15,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const userSelect = document.getElementById('userSelect');
   const tankList = document.getElementById('tankList');
+  const deleteBtn = document.getElementById('deleteBtn');
 
-  // Funkcja do pobrania listy użytkowników (dokumentów w kolekcji)
+  // Pobierz użytkowników (dokumenty z kolekcji tankLists)
   async function loadUsers() {
     try {
       const snapshot = await db.collection('tankLists').get();
-      if (snapshot.empty) {
-        userSelect.innerHTML = '<option value="">Brak użytkowników w bazie</option>';
-        return;
-      }
       userSelect.innerHTML = '<option value="">-- wybierz użytkownika --</option>';
       snapshot.forEach(doc => {
         const option = document.createElement('option');
@@ -36,31 +33,32 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Po wybraniu użytkownika pokazujemy listę pozycji (bez nazw)
+  // Pokaż pozycje czołgów danego użytkownika
   async function showPositions(userId) {
-    tankList.innerHTML = ''; // Czyścimy listę
+    tankList.innerHTML = '';
+    deleteBtn.style.display = userId ? 'inline-block' : 'none';
+
     if (!userId) return;
 
     try {
       const doc = await db.collection('tankLists').doc(userId).get();
       if (!doc.exists) {
-        tankList.innerHTML = '<li class="list-group-item">Brak danych dla wybranego użytkownika.</li>';
+        tankList.innerHTML = '<li class="list-group-item">Brak danych.</li>';
         return;
       }
+
       const tanks = doc.data().tanks || [];
       if (tanks.length === 0) {
         tankList.innerHTML = '<li class="list-group-item">Lista czołgów jest pusta.</li>';
         return;
       }
 
-      // Tworzymy element listy dla każdej pozycji
       tanks.forEach((tank, index) => {
         const li = document.createElement('li');
         li.className = 'list-group-item list-group-item-action';
         li.textContent = `Pozycja ${index + 1}`;
         li.style.cursor = 'pointer';
 
-        // Po kliknięciu pokazujemy nazwę czołgu w alert lub możesz zmienić na inny sposób wyświetlania
         li.addEventListener('click', () => {
           alert(`Czołg na pozycji ${index + 1}: ${tank}`);
         });
@@ -68,15 +66,36 @@ window.addEventListener('DOMContentLoaded', async () => {
         tankList.appendChild(li);
       });
     } catch (error) {
-      alert('Błąd podczas pobierania listy czołgów: ' + error.message);
+      alert('Błąd podczas pobierania listy: ' + error.message);
     }
   }
 
-  // Nasłuchujemy zmiany wyboru użytkownika
+  // Nasłuchiwanie zmiany wyboru gracza
   userSelect.addEventListener('change', () => {
-    showPositions(userSelect.value);
+    const userId = userSelect.value;
+    showPositions(userId);
   });
 
-  // Start - wczytujemy użytkowników do selecta
+  // Obsługa przycisku "Usuń listę"
+  deleteBtn.addEventListener('click', async () => {
+    const userId = userSelect.value;
+    if (!userId) return;
+
+    const confirmDelete = confirm(`Czy na pewno chcesz usunąć listę gracza "${userId}"?`);
+    if (!confirmDelete) return;
+
+    try {
+      await db.collection('tankLists').doc(userId).delete();
+      alert(`Lista gracza ${userId} została usunięta.`);
+      userSelect.value = '';
+      tankList.innerHTML = '';
+      deleteBtn.style.display = 'none';
+      await loadUsers();
+    } catch (err) {
+      alert('Błąd przy usuwaniu: ' + err.message);
+    }
+  });
+
+  // Start: załaduj użytkowników do selecta
   await loadUsers();
 });
