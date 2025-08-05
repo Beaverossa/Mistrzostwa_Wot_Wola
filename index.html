@@ -3,104 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lista Czołgów</title>
+  <title>Dodaj Czołgi</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="firebase_script.js"></script>
 </head>
 <body class="p-4">
   <div class="container">
-    <h1 class="mb-4">Stwórz listę czołgów</h1>
+    <h1 class="mb-4">Formularz gracza</h1>
 
-    <div class="mb-3">
-      <label for="nameSelect" class="form-label">Wybierz imię</label>
-      <select id="nameSelect" class="form-select">
-        <option value="">-- wybierz --</option>
-        <option value="Kacper">Kacper</option>
-        <option value="Miłosz">Miłosz</option>
-        <option value="Jakub">Jakub</option>
-      </select>
-    </div>
+    <form id="tankForm">
+      <div class="mb-3">
+        <label for="nameSelect" class="form-label">Wybierz imię:</label>
+        <select class="form-select" id="nameSelect" required>
+          <option value="">-- wybierz --</option>
+          <option value="Jakub">Jakub</option>
+          <option value="Miłosz">Miłosz</option>
+          <option value="Kacper">Kacper</option>
+        </select>
+      </div>
 
-    <div id="tankCountContainer" class="mb-3 d-none">
-      <label for="tankCount" class="form-label">Liczba czołgów</label>
-      <input type="number" id="tankCount" class="form-control mb-2" min="1" />
-      <button class="btn btn-secondary" id="generateBtn">Generuj pola</button>
-    </div>
+      <div class="mb-3" id="tankCountContainer" style="display: none;">
+        <label for="tankCount" class="form-label">Liczba czołgów:</label>
+        <input type="number" class="form-control" id="tankCount" min="1" max="50" required />
+      </div>
 
-    <form id="tankForm" class="mb-3"></form>
-    <button id="saveButton" class="btn btn-success d-none">Zapisz listę</button>
+      <div id="tankInputs" class="mb-3"></div>
+
+      <button type="submit" class="btn btn-primary">Zapisz listę</button>
+    </form>
 
     <hr />
-    <a href="archive.html" class="btn btn-link">Archiwum Czołgów</a>
     <a href="match.html" class="btn btn-link">Pojedynki</a>
-    <a href="history.html" class="btn btn-link">Historia Pojedynków</a>
+    <a href="archive.html" class="btn btn-link">Archiwum</a>
+    <a href="history.html" class="btn btn-link">Historia</a>
   </div>
 
-  <script>
-    const nameSelect = document.getElementById('nameSelect');
-    const tankCountContainer = document.getElementById('tankCountContainer');
-    const tankCountInput = document.getElementById('tankCount');
-    const generateBtn = document.getElementById('generateBtn');
-    const tankForm = document.getElementById('tankForm');
-    const saveButton = document.getElementById('saveButton');
-
-    nameSelect.addEventListener('change', () => {
-      if (nameSelect.value) {
-        tankCountContainer.classList.remove('d-none');
-        tankForm.innerHTML = '';
-        saveButton.classList.add('d-none');
-      } else {
-        tankCountContainer.classList.add('d-none');
-        tankForm.innerHTML = '';
-        saveButton.classList.add('d-none');
-      }
-    });
-
-    generateBtn.addEventListener('click', () => {
-      const count = parseInt(tankCountInput.value);
-      if (isNaN(count) || count < 1) {
-        alert('Podaj poprawną liczbę czołgów (min 1)');
-        return;
-      }
-      tankForm.innerHTML = '';
-      for (let i = 1; i <= count; i++) {
-        const div = document.createElement('div');
-        div.className = 'mb-2';
-        div.innerHTML = `<label class="form-label">Czołg ${i}</label>
-                         <input type="text" class="form-control tankName" placeholder="Nazwa czołgu ${i}" required />`;
-        tankForm.appendChild(div);
-      }
-      saveButton.classList.remove('d-none');
-    });
-
-    saveButton.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const name = nameSelect.value;
-      const tankInputs = tankForm.querySelectorAll('.tankName');
-      const tanks = Array.from(tankInputs).map(input => input.value.trim());
-
-      if (!name) {
-        alert('Wybierz imię');
-        return;
-      }
-      if (tanks.some(t => !t)) {
-        alert('Wpisz nazwy wszystkich czołgów');
-        return;
-      }
-
-      try {
-        await saveTankList(name, tanks);
-        alert('Lista została zapisana w chmurze!');
-        tankForm.innerHTML = '';
-        tankCountContainer.classList.add('d-none');
-        saveButton.classList.add('d-none');
-        nameSelect.value = '';
-      } catch (err) {
-        alert('Błąd podczas zapisu: ' + err.message);
-      }
-    });
-  </script>
+  <!-- Firebase & Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="firebase_script.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>
