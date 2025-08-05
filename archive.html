@@ -18,16 +18,19 @@
         <option value="">-- wybierz użytkownika --</option>
       </select>
     </div>
-    <ul id="tankList" class="list-group"></ul>
-    <a href="index.html" class="btn btn-link mt-3">Powrót</a>
+
+    <ul id="tankList" class="list-group mb-3"></ul>
+
+    <!-- Nowy przycisk do usuwania -->
+    <button id="deleteBtn" class="btn btn-danger" style="display: none;">Usuń listę czołgów</button>
+
+    <a href="index.html" class="btn btn-link mt-3 d-block">Powrót</a>
   </div>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="firebase_script.js"></script>
-
-  <!-- Archiwum skrypt -->
   <script src="archive.js"></script>
 </body>
 </html>
