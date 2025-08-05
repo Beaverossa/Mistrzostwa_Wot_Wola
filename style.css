@@ -1,4 +1,4 @@
-/* style.css */
+/* style.css - Dark Theme with smooth transitions */
 
 /* Body */
 body {
@@ -6,18 +6,23 @@ body {
   color: #e0e0e0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
+  margin: 0;
+  padding: 1rem;
 }
 
 /* Container */
 .container {
   max-width: 700px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem;
 }
 
 /* Headings */
 h1, h2 {
   color: #90caf9;
   font-weight: 700;
+  margin-bottom: 1rem;
 }
 
 /* Forms */
@@ -25,18 +30,19 @@ h1, h2 {
   font-weight: 600;
 }
 
-.form-control {
+.form-control, .form-select {
   background-color: #1e1e1e;
   border: 1px solid #333;
   color: #e0e0e0;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
-.form-control:focus {
+.form-control:focus, .form-select:focus {
   border-color: #64b5f6;
-  box-shadow: 0 0 5px #64b5f6;
+  box-shadow: 0 0 8px #64b5f6;
   background-color: #222;
   color: #fff;
+  outline: none;
 }
 
 /* Buttons */
@@ -44,43 +50,51 @@ h1, h2 {
   background-color: #64b5f6;
   border: none;
   transition: background-color 0.3s ease;
+  color: #fff;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
   background-color: #42a5f5;
+  color: #fff;
 }
 
 .btn-success {
   background-color: #81c784;
   border: none;
   transition: background-color 0.3s ease;
+  color: #fff;
 }
 
 .btn-success:hover,
 .btn-success:focus {
   background-color: #66bb6a;
+  color: #fff;
 }
 
 .btn-danger {
   background-color: #e57373;
   border: none;
   transition: background-color 0.3s ease;
+  color: #fff;
 }
 
 .btn-danger:hover,
 .btn-danger:focus {
   background-color: #ef5350;
+  color: #fff;
 }
 
 .btn-link {
   color: #90caf9;
   text-decoration: none;
   font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .btn-link:hover {
   text-decoration: underline;
+  color: #64b5f6;
 }
 
 /* List Group */
@@ -90,42 +104,35 @@ h1, h2 {
   color: #e0e0e0;
   transition: background-color 0.3s ease;
   cursor: default;
+  user-select: none;
 }
 
 .list-group-item:hover {
   background-color: #2a2a2a;
 }
 
-/* Select */
-.form-select {
-  background-color: #1e1e1e;
-  border: 1px solid #333;
-  color: #e0e0e0;
-  transition: border-color 0.3s ease;
-}
-
-.form-select:focus {
-  border-color: #64b5f6;
-  box-shadow: 0 0 5px #64b5f6;
-  background-color: #222;
-  color: #fff;
-}
-
 /* Responsive tweaks */
 @media (max-width: 576px) {
   body {
-    padding: 1rem;
+    padding: 0.75rem;
   }
   .container {
     max-width: 100%;
+    padding: 0.5rem;
   }
 }
 
 /* Misc */
 hr {
   border-color: #333;
+  margin: 2rem 0;
 }
 
 label {
   user-select: none;
+}
+
+/* Optional: smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
 }
