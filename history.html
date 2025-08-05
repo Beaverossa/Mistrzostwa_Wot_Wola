@@ -13,12 +13,13 @@
     <ul id="rankingList" class="list-group"></ul>
     <a href="index.html" class="btn btn-link mt-4">Powrót</a>
   </div>
- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<!-- niepotrzebny analytics -->
-<script src="firebase_script.js"></script>
-<script src="history.js"></script>
 
+  <!-- Firebase SDKs - UWAGA: muszą być załadowane przed firebase_script.js -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Inicjalizacja Firebase + Twoje skrypty -->
+  <script src="firebase_script.js"></script>
+  <script src="history.js"></script>
 </body>
 </html>
-
