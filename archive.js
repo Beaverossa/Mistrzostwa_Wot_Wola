@@ -1,108 +1,65 @@
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
   const userSelect = document.getElementById('userSelect');
   const tankList = document.getElementById('tankList');
-  const deleteAllBtn = document.getElementById('deleteAllBtn');
 
-  function waitForDb() {
-    return new Promise(resolve => {
+  // ⏳ Czekaj aż firebase_script.js ustawi db
+  async function waitForDbReady() {
+    return new Promise((resolve) => {
       const interval = setInterval(() => {
-        if (typeof db !== 'undefined' && db) {
+        if (typeof db !== 'undefined' && db !== null) {
           clearInterval(interval);
           resolve();
         }
-      }, 50);
+      }, 100);
     });
   }
 
-  await waitForDb();
-
   async function loadUsers() {
-    try {
-      const snapshot = await db.collection('tankLists').get();
-      userSelect.innerHTML = '<option value="">-- wybierz użytkownika --</option>';
-      snapshot.forEach(doc => {
-        const option = document.createElement('option');
-        option.value = doc.id;
-        option.textContent = doc.id;
-        userSelect.appendChild(option);
-      });
-    } catch (error) {
-      alert('Błąd podczas ładowania użytkowników: ' + error.message);
-    }
+    const snapshot = await db.collection('tankLists').get();
+    userSelect.innerHTML = '<option value="">-- wybierz --</option>';
+    snapshot.forEach(doc => {
+      const option = document.createElement('option');
+      option.value = doc.id;
+      option.textContent = doc.id;
+      userSelect.appendChild(option);
+    });
   }
 
-  async function showPositions(userId) {
+  async function showTanksForUser(userId) {
     tankList.innerHTML = '';
-    deleteAllBtn.style.display = userId ? 'inline-block' : 'none';
-
     if (!userId) return;
 
-    try {
-      const docRef = db.collection('tankLists').doc(userId);
-      const doc = await docRef.get();
-      if (!doc.exists) {
-        tankList.innerHTML = '<li class="list-group-item">Brak danych.</li>';
-        return;
-      }
+    const docRef = db.collection('tankLists').doc(userId);
+    const docSnap = await docRef.get();
 
-      const tanks = doc.data().tanks || [];
-
-      if (tanks.length === 0) {
-        tankList.innerHTML = '<li class="list-group-item">Lista czołgów jest pusta.</li>';
-        return;
-      }
-
-      tanks.forEach((tank, index) => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-
-        const label = document.createElement('span');
-        label.textContent = `Pozycja ${index + 1}`;
-        label.style.cursor = 'pointer';
-        label.onclick = () => alert(`Czołg na pozycji ${index + 1}: ${tank}`);
-
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn btn-sm btn-outline-danger';
-        delBtn.textContent = 'Usuń';
-        delBtn.onclick = async () => {
-          if (!confirm(`Czy chcesz usunąć pozycję ${index + 1}?`)) return;
-          tanks.splice(index, 1); // usuń dany czołg
-          await docRef.set({ tanks: tanks, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-          showPositions(userId); // odśwież
-        };
-
-        li.appendChild(label);
-        li.appendChild(delBtn);
-        tankList.appendChild(li);
-      });
-    } catch (error) {
-      alert('Błąd podczas pobierania listy: ' + error.message);
+    if (!docSnap.exists) {
+      tankList.innerHTML = '<li class="list-group-item">Brak danych.</li>';
+      return;
     }
+
+    const tanks = docSnap.data().tanks || [];
+
+    if (tanks.length === 0) {
+      tankList.innerHTML = '<li class="list-group-item">Brak czołgów.</li>';
+      return;
+    }
+
+    tanks.forEach((tank, index) => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item';
+      li.innerHTML = `
+        Pozycja ${index + 1}
+        <button class="btn btn-sm btn-outline-secondary float-end" onclick="alert('Czołg: ${tank}')">Pokaż</button>
+      `;
+      tankList.appendChild(li);
+    });
   }
 
   userSelect.addEventListener('change', () => {
-    const userId = userSelect.value;
-    showPositions(userId);
+    const selectedUser = userSelect.value;
+    showTanksForUser(selectedUser);
   });
 
-  deleteAllBtn.addEventListener('click', async () => {
-    const userId = userSelect.value;
-    if (!userId) return;
-
-    const confirmDelete = confirm(`Czy na pewno chcesz usunąć całą listę gracza "${userId}"?`);
-    if (!confirmDelete) return;
-
-    try {
-      await db.collection('tankLists').doc(userId).delete();
-      alert(`Lista gracza ${userId} została usunięta.`);
-      userSelect.value = '';
-      tankList.innerHTML = '';
-      deleteAllBtn.style.display = 'none';
-      await loadUsers();
-    } catch (err) {
-      alert('Błąd przy usuwaniu: ' + err.message);
-    }
-  });
-
-  await loadUsers();
+  // 🔁 Start
+  waitForDbReady().then(loadUsers);
 });
