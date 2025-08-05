@@ -1,31 +1,55 @@
 window.addEventListener('DOMContentLoaded', () => {
+  const auth = window.auth;
+  const db = window.db;
+
   const form = document.getElementById('tankForm');
   const nameSelect = document.getElementById('nameSelect');
   const tankCountInput = document.getElementById('tankCount');
   const tankInputs = document.getElementById('tankInputs');
   const tankCountContainer = document.getElementById('tankCountContainer');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  // Sprawdzanie czy użytkownik jest zalogowany
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = 'login.html';
+    } else {
+      form.style.display = 'block';
+    }
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    auth.signOut().then(() => {
+      window.location.href = 'login.html';
+    });
+  });
 
   nameSelect.addEventListener('change', () => {
     tankCountContainer.style.display = nameSelect.value ? 'block' : 'none';
+    tankInputs.innerHTML = '';
+    tankCountInput.value = '';
   });
 
   tankCountInput.addEventListener('input', () => {
     const count = parseInt(tankCountInput.value);
     tankInputs.innerHTML = '';
-    for (let i = 1; i <= count; i++) {
-      tankInputs.innerHTML += `
-        <div class="mb-2">
-          <label class="form-label">Czołg ${i}:</label>
-          <input type="text" class="form-control" required />
-        </div>
-      `;
+    if (count > 0 && count <= 50) {
+      for (let i = 1; i <= count; i++) {
+        tankInputs.innerHTML += `
+          <div class="mb-2">
+            <label class="form-label">Czołg ${i}:</label>
+            <input type="text" class="form-control" required />
+          </div>
+        `;
+      }
     }
   });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     if (!db) {
-      alert("Baza danych jeszcze się ładuje. Spróbuj za chwilę.");
+      alert("Baza danych się jeszcze ładuje, spróbuj później.");
       return;
     }
 
@@ -33,10 +57,16 @@ window.addEventListener('DOMContentLoaded', () => {
     const inputs = tankInputs.querySelectorAll('input');
     const tanks = [...inputs].map(input => input.value.trim()).filter(v => v !== '');
 
+    if (tanks.length === 0) {
+      alert('Wprowadź nazwy przynajmniej jednego czołgu.');
+      return;
+    }
+
     try {
       await db.collection('tankLists').doc(name).set({
         tanks: tanks,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        userId: auth.currentUser.uid
       });
       alert('Zapisano listę!');
       form.reset();
