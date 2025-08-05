@@ -12,8 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   firebase.initializeApp(firebaseConfig);
-  // Usuń poniższą linię, jeśli nie potrzebujesz analytics
-  // firebase.analytics();
+  // firebase.analytics(); // usuń, jeśli nie używasz Analytics
 
   db = firebase.firestore();
 });
