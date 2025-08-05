@@ -4,19 +4,25 @@ window.addEventListener('DOMContentLoaded', async () => {
   const deleteListBtn = document.getElementById('deleteListBtn');
 
   async function loadPlayers() {
-    const snapshot = await db.collection('tankLists').get();
-    userSelect.innerHTML = '<option value="">-- wybierz gracza --</option>';
-    snapshot.forEach(doc => {
-      const option = document.createElement('option');
-      option.value = doc.id;
-      option.textContent = doc.id;
-      userSelect.appendChild(option);
-    });
+    try {
+      const snapshot = await db.collection('tankLists').get();
+      userSelect.innerHTML = '<option value="">-- wybierz gracza --</option>';
+      snapshot.forEach(doc => {
+        const option = document.createElement('option');
+        option.value = doc.id;
+        option.textContent = doc.id;
+        userSelect.appendChild(option);
+      });
+    } catch (err) {
+      alert('Błąd podczas ładowania graczy: ' + err.message);
+    }
   }
 
   function clearTanks() {
     tankList.innerHTML = '';
-    deleteListBtn.style.display = 'none';
+    if (deleteListBtn) {
+      deleteListBtn.style.display = 'none';
+    }
   }
 
   userSelect.addEventListener('change', async () => {
@@ -34,28 +40,34 @@ window.addEventListener('DOMContentLoaded', async () => {
           li.textContent = `${i + 1}. ${tank}`;
           tankList.appendChild(li);
         });
-        deleteListBtn.style.display = 'inline-block';
+        if (deleteListBtn) {
+          deleteListBtn.style.display = 'inline-block';
+        }
+      } else {
+        alert('Brak danych dla wybranego gracza.');
       }
     } catch (err) {
       alert('Błąd podczas wczytywania listy: ' + err.message);
     }
   });
 
-  deleteListBtn.addEventListener('click', async () => {
-    const selectedUser = userSelect.value;
-    if (!selectedUser) return;
-    if (!confirm(`Czy na pewno chcesz usunąć listę gracza ${selectedUser}?`)) return;
+  if (deleteListBtn) {
+    deleteListBtn.addEventListener('click', async () => {
+      const selectedUser = userSelect.value;
+      if (!selectedUser) return;
+      if (!confirm(`Czy na pewno chcesz usunąć listę gracza ${selectedUser}?`)) return;
 
-    try {
-      await db.collection('tankLists').doc(selectedUser).delete();
-      alert('Lista została usunięta!');
-      clearTanks();
-      await loadPlayers();
-      userSelect.value = '';
-    } catch (err) {
-      alert('Błąd podczas usuwania listy: ' + err.message);
-    }
-  });
+      try {
+        await db.collection('tankLists').doc(selectedUser).delete();
+        alert('Lista została usunięta!');
+        clearTanks();
+        await loadPlayers();
+        userSelect.value = '';
+      } catch (err) {
+        alert('Błąd podczas usuwania listy: ' + err.message);
+      }
+    });
+  }
 
   await loadPlayers();
 });
