@@ -9,7 +9,6 @@
 <body class="p-4">
   <div class="container">
     <h1 class="mb-4">Formularz gracza</h1>
-
     <form id="tankForm">
       <div class="mb-3">
         <label for="nameSelect" class="form-label">Wybierz imię:</label>
@@ -20,24 +19,20 @@
           <option value="Kacper">Kacper</option>
         </select>
       </div>
-
       <div class="mb-3" id="tankCountContainer" style="display: none;">
         <label for="tankCount" class="form-label">Liczba czołgów:</label>
         <input type="number" class="form-control" id="tankCount" min="1" max="50" required />
       </div>
-
       <div id="tankInputs" class="mb-3"></div>
-
       <button type="submit" class="btn btn-primary">Zapisz listę</button>
     </form>
-
     <hr />
     <a href="match.html" class="btn btn-link">Pojedynki</a>
     <a href="archive.html" class="btn btn-link">Archiwum</a>
     <a href="history.html" class="btn btn-link">Historia</a>
   </div>
 
-  <!-- Firebase & Scripts -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
