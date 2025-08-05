@@ -1,51 +1,80 @@
 window.addEventListener('DOMContentLoaded', async () => {
   const player1Select = document.getElementById('player1Select');
   const player2Select = document.getElementById('player2Select');
-  const player1PosInput = document.getElementById('player1Pos');
-  const player2PosInput = document.getElementById('player2Pos');
+  const position1Input = document.getElementById('position1');
+  const position2Input = document.getElementById('position2');
+  const showTanksBtn = document.getElementById('showTanksBtn');
+  const tank1Name = document.getElementById('tank1Name');
+  const tank2Name = document.getElementById('tank2Name');
   const winnerSelect = document.getElementById('winnerSelect');
   const matchForm = document.getElementById('matchForm');
 
-  // Load all player names to selects
   async function loadPlayers() {
-    const snapshot = await db.collection('tankLists').get();
-    player1Select.innerHTML = '<option value="">-- wybierz --</option>';
-    player2Select.innerHTML = '<option value="">-- wybierz --</option>';
-    snapshot.forEach(doc => {
-      const name = doc.id;
-      const option1 = document.createElement('option');
-      option1.value = name;
-      option1.textContent = name;
-      player1Select.appendChild(option1);
+    try {
+      const snapshot = await db.collection('tankLists').get();
+      player1Select.innerHTML = '<option value="">-- wybierz gracza --</option>';
+      player2Select.innerHTML = '<option value="">-- wybierz gracza --</option>';
+      snapshot.forEach(doc => {
+        const option1 = document.createElement('option');
+        option1.value = doc.id;
+        option1.textContent = doc.id;
+        player1Select.appendChild(option1);
 
-      const option2 = document.createElement('option');
-      option2.value = name;
-      option2.textContent = name;
-      player2Select.appendChild(option2);
-    });
+        const option2 = option1.cloneNode(true);
+        player2Select.appendChild(option2);
+      });
+    } catch (err) {
+      alert('Błąd podczas ładowania graczy: ' + err.message);
+    }
   }
 
-  await loadPlayers();
+  async function getTankName(player, position) {
+    if (!player || !position) return null;
+    try {
+      const doc = await db.collection('tankLists').doc(player).get();
+      if (doc.exists) {
+        const tanks = doc.data().tanks || [];
+        const idx = parseInt(position, 10) - 1;
+        if (idx >= 0 && idx < tanks.length) {
+          return tanks[idx];
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching tank:', err);
+    }
+    return null;
+  }
 
-  matchForm.addEventListener('submit', async e => {
+  showTanksBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const player1 = player1Select.value;
+    const player2 = player2Select.value;
+    const pos1 = position1Input.value;
+    const pos2 = position2Input.value;
+
+    if (!player1 || !player2 || !pos1 || !pos2) {
+      alert('Wypełnij wszystkie pola aby pokazać nazwy czołgów.');
+      return;
+    }
+
+    const tank1 = await getTankName(player1, pos1);
+    const tank2 = await getTankName(player2, pos2);
+
+    tank1Name.textContent = tank1 || 'Brak danych';
+    tank2Name.textContent = tank2 || 'Brak danych';
+  });
+
+  matchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const player1 = player1Select.value;
     const player2 = player2Select.value;
-    const player1Pos = parseInt(player1PosInput.value);
-    const player2Pos = parseInt(player2PosInput.value);
+    const pos1 = position1Input.value;
+    const pos2 = position2Input.value;
     const winner = winnerSelect.value;
 
-    if (!player1 || !player2 || !winner) {
-      alert('Wypełnij wszystkie pola!');
-      return;
-    }
-    if (player1 === player2) {
-      alert('Wybierz różnych graczy!');
-      return;
-    }
-    if (player1Pos < 1 || player2Pos < 1) {
-      alert('Numer pozycji musi być >= 1!');
+    if (!player1 || !player2 || !pos1 || !pos2 || !winner) {
+      alert('Wypełnij wszystkie pola.');
       return;
     }
 
@@ -53,15 +82,19 @@ window.addEventListener('DOMContentLoaded', async () => {
       await db.collection('matches').add({
         player1,
         player2,
-        player1Pos,
-        player2Pos,
+        player1Pos: parseInt(pos1, 10),
+        player2Pos: parseInt(pos2, 10),
         winner,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      alert('Wynik zapisany!');
+      alert('Pojedynek zapisany!');
       matchForm.reset();
+      tank1Name.textContent = '';
+      tank2Name.textContent = '';
     } catch (err) {
-      alert('Błąd zapisu: ' + err.message);
+      alert('Błąd podczas zapisu pojedynku: ' + err.message);
     }
   });
+
+  await loadPlayers();
 });
